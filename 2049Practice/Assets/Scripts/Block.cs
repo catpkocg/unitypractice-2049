@@ -8,10 +8,11 @@ public class Block : MonoBehaviour
     public Vector2 Pos => transform.position;
 
     public Node Node;
+    public Block block;
 
-    public void SetBlock(Node node)
+    public void SetBlock(Block block)
     {
-        if (Node != null)
+        if (block != null)
         {
             Node.OccupiedBlock = null;
         }

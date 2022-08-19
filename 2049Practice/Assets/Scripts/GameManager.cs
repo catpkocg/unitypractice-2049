@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -17,10 +18,6 @@ public class GameManager : MonoBehaviour
 
     private List<Node> nodes;
     private List<Block> blocks;
-
-    private List<Block> OqNodes;
-
-
 
 
     void Start()
@@ -54,8 +51,7 @@ public class GameManager : MonoBehaviour
     void SpawnBlocks()
     {
         
-        var freeNodes = nodes.Where(n => n.OccupiedBlock == false).OrderBy(b => Random.value).ToList();
- 
+        var freeNodes = nodes.Where(n => n.OccupiedBlock == null).OrderBy(b => Random.value).ToList();
         
         var Iv1 = new Vector2(-1, -0);
         var Iv2 = new Vector2(0, 0);
@@ -66,14 +62,12 @@ public class GameManager : MonoBehaviour
         Iv.Add(Iv1);
         Iv.Add(Iv2);
         Iv.Add(Iv3);
-        
-        List<Node> OqNodes = new List<Node>();
+
         for (int i = 0; i < Iv.Count; i++)
         {
             var block = Instantiate(blockPrefab, freeNodes[1].Pos + Iv[i], Quaternion.identity);
-            List<Node> OqNodes = new List<Node>();
-
-
+            blocks.Add(block);
+            
         }
         
 
