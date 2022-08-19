@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,18 +5,18 @@ using UnityEngine;
 public class Block : MonoBehaviour
 {
     public Vector2 Pos => transform.position;
+    
+    
 
-    public Node Node;
-    public Block block;
-
-    public void SetBlock(Block block)
+    // Start is called before the first frame update
+    void Start()
     {
-        if (block != null)
-        {
-            Node.OccupiedBlock = null;
-        }
-        Node = node;
-        Node.OccupiedBlock = this;
+        
+    }
 
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 }

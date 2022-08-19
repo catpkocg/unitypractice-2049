@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Node : MonoBehaviour
 {
+    public bool value = true;
     public Vector2 Pos => transform.position;
-
-    public Block OccupiedBlock;
+    
+    public 
     // Start is called before the first frame update
     void Start()
     {
