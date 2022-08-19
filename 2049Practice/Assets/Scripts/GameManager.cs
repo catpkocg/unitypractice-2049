@@ -14,14 +14,19 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Node nodePrefab;
     [SerializeField] private Block blockPrefab;
 
+
     private List<Node> nodes;
-    [SerializeField] private List<Block> blocks;
+    private List<Block> blocks;
+
+    private List<Block> OqNodes;
+
 
 
 
     void Start()
     {
         GenerateGrid();
+
         SpawnBlocks();
 
     }
@@ -42,13 +47,15 @@ public class GameManager : MonoBehaviour
 
         var center = new Vector2((float)width / 2 - 0.5f, (float)height / 2 - 0.5f);
 
+
         Camera.main.transform.position = new Vector3(center.x, center.y, -10);
     }
 
     void SpawnBlocks()
     {
         
-        var freeNodes = nodes.Where(n => n.OccupiedBlock = null).OrderBy(b => Random.value);
+        var freeNodes = nodes.Where(n => n.OccupiedBlock == false).OrderBy(b => Random.value).ToList();
+ 
         
         var Iv1 = new Vector2(-1, -0);
         var Iv2 = new Vector2(0, 0);
@@ -59,21 +66,25 @@ public class GameManager : MonoBehaviour
         Iv.Add(Iv1);
         Iv.Add(Iv2);
         Iv.Add(Iv3);
+        
+        List<Node> OqNodes = new List<Node>();
+        for (int i = 0; i < Iv.Count; i++)
+        {
+            var block = Instantiate(blockPrefab, freeNodes[1].Pos + Iv[i], Quaternion.identity);
+            List<Node> OqNodes = new List<Node>();
 
-       
-            for (int i = 0; i < Iv.Count; i++)
-            {
-                var block = Instantiate(blockPrefab, Iv[i], quaternion.identity);
-                blocks.Add(block);
-            }
+
+        }
         
 
 
-        if (freeNodes.Count() == 2)
-        {
-            //Game Over;
-            return;
-        }
     }
 
+    public void asdf()
+    {
+        var adsf = new Vector2(0, 0);
+        
+    }
 }
+    
+    

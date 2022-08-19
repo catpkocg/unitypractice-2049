@@ -5,17 +5,18 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
+    public Vector2 Pos => transform.position;
 
+    public Node Node;
 
-    // Start is called before the first frame update
-    void Start()
+    public void SetBlock(Node node)
     {
-        
-    }
+        if (Node != null)
+        {
+            Node.OccupiedBlock = null;
+        }
+        Node = node;
+        Node.OccupiedBlock = this;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
