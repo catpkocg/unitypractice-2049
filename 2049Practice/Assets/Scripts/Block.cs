@@ -11,7 +11,7 @@ public class Block : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        BlockPos = transform.parent.position;
+        BlockPos = transform.position;
         GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
 
         ShapePos = new Vector3[transform.childCount];

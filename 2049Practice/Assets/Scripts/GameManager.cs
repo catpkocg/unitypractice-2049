@@ -17,6 +17,10 @@ public class GameManager : MonoBehaviour
     public Transform[] BlockPos;
     public event System.Action EditorRepaint = () => { };
 
+    public GameObject BASE;
+
+    private List<Vector3> GoodPos;
+
 
 
     private Vector2[] BlockShape;
@@ -25,15 +29,29 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Instantiate(Blocks[0], new Vector3(3, 3, 0), Quaternion.identity);
+        Array[3, 3] = 1;
+        Array[2, 3] = 1;
+        Array[4, 3] = 1;
         //초기 array 값은 모두 0;
         // block 위치대로 array 값 1 주기.
+        
+        //블락별로 index 다르게 주기
+        //점수에 영향
+        
         GenerateGrid();
+        Debug.Log(Nodes[1].Pos);
+        Debug.Log(Nodes[2].Pos);
+        Debug.Log(Nodes[64].Pos);
     }
     
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            var Cute = Blocks[0].GetComponent<Block>().ShapePos;
+            CanSpawn(Cute);
+        }
     }
     void GenerateGrid()
     {
@@ -42,7 +60,9 @@ public class GameManager : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
                 var node = Instantiate(nodePrefab, new Vector2(x, y), Quaternion.identity);
+                node.transform.SetParent(BASE.transform);
                 Nodes.Add(node);
+                
                 
             }
         }
@@ -70,9 +90,12 @@ public class GameManager : MonoBehaviour
 
         return true;
     }
+    
+    
+    
 
     //랜덤 블락 고른후에 대입. 
-    bool ThisBlockCanSpawn(Vector3[] ShapePos)
+    bool CanSpawn(Vector3[] ShapePos)
     {
         for (int i = 0; i < width; i++)
         {
@@ -87,15 +110,28 @@ public class GameManager : MonoBehaviour
                     ++count;
                 }
 
-                if (count == ShapePos.Length) return true;
+                if (count == ShapePos.Length)
+                {
+    //              GoodPos.Add(new Vector3(i,j,0));
+                    return true;
+                }
             }
         }
-
+        
         return false;
     }
-    
-    
-    
+    //랜덤블럭 재생성.
+
+    void SpawnBlock()
+    {
+        /*all check
+            if 오른쪽 왼쪽 다 0 이면 그자리에 Instantiate
+            생성후 1로 바꿔주기.
+            */
+        
+    }
+
+
     
     
     

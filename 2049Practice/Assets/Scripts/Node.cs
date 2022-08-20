@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Node : MonoBehaviour
 {
-    private Vector3 NodePos => transform.position;
+    public Vector3 Pos => transform.position;
     // Start is called before the first frame update
     void Start()
     {
