@@ -1,89 +1,103 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.Mathematics;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private int width = 8;
-    [SerializeField] private int height = 8;
-    [SerializeField] private Node nodePrefab;
-    [SerializeField] private TetrisBlock blockPrefab;
+    [SerializeField]
+    private int width = 8;
+    [SerializeField]
+    private int height = 8;
+    [SerializeField]
+    private Node nodePrefab;
+    
+    public GameObject[] Blocks;
+    public List<Node> Nodes;
+    public int[,] Array = new int [8, 8];
+    public Transform[] BlockPos;
+    public event System.Action EditorRepaint = () => { };
 
-    [SerializeField]
-    private GameObject[] TetrisBlcoks;
 
-    [SerializeField]
-    private List<Node> nodes;
-    [SerializeField]
-    private List<Block> blocks;
-    //[SerializeField]
-    //private Dictionary<Vector2, Node> Positions;
-    [SerializeField]
-    private GameObject gridCellPrefab;
-    private GameObject[,] gameGrid;
+
+    private Vector2[] BlockShape;
     
     // Start is called before the first frame update
     void Start()
     {
+        Instantiate(Blocks[0], new Vector3(3, 3, 0), Quaternion.identity);
+        //초기 array 값은 모두 0;
+        // block 위치대로 array 값 1 주기.
         GenerateGrid();
-        
-        SpawnBlocks();
-
     }
-
+    
     // Update is called once per frame
     void Update()
     {
         
     }
-
     void GenerateGrid()
     {
-        nodes = new List<Node>();
-        blocks = new List<Block>();
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 var node = Instantiate(nodePrefab, new Vector2(x, y), Quaternion.identity);
-                nodes.Add(node);
+                Nodes.Add(node);
+                
             }
         }
-        
-        
+
         var center = new Vector2((float)width / 2 - 0.5f, (float)height / 2 - 0.5f);
         Camera.main.transform.position = new Vector3(center.x, center.y, -10);
+
     }
 
-    void SpawnBlocks()
+    bool InRange(int x, int y)
     {
-        var position = new Dictionary<Vector2,Node>();
-        for (int i = 1; i < nodes.Count; i++)
+        if (x < 0 || y < 0 || x >= width || y >= height)
         {
-            position.Add(nodes[i].Pos,nodes[i]);
+            return false;
         }
-        
-        int randomX = Random.Range(0, 8);
-        int randomY = Random.Range(0, 8);
-        int randomBlcok = Random.Range(0, TetrisBlcoks.Length);
-        Instantiate(TetrisBlcoks[randomBlcok], new Vector2(randomX, randomY),
-            Quaternion.identity);
-        if(nodes)
-        if (randomBlcok == 0)
-        {
-            var block1 = Instantiate(TetrisBlcoks[Random.Range(0, TetrisBlcoks.Length)], new Vector2(randomX-1, randomY),
-                Quaternion.identity);
-            var block2 = Instantiate(TetrisBlcoks[Random.Range(0, TetrisBlcoks.Length)], new Vector2(randomX+1, randomY),
-                Quaternion.identity);
-        } else if (randomBlcok == 1)
-        {
-            var block1 = Instantiate(TetrisBlcoks[Random.Range(0, TetrisBlcoks.Length)], new Vector2(randomX, randomY-1),
-                Quaternion.identity);
-            var block2 = Instantiate(TetrisBlcoks[Random.Range(0, TetrisBlcoks.Length)], new Vector2(randomX, randomY+1),
-                Quaternion.identity);
-        }
+        return true;
     }
+
+    bool Possible(int x, int y)
+    {
+        if (Array[x, y] != 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    //랜덤 블락 고른후에 대입. 
+    bool ThisBlockCanSpawn(Vector3[] ShapePos)
+    {
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                int count = 0;
+                for (int k = 0; k < ShapePos.Length; k++)
+                {
+                    Vector3 CurShapePos = ShapePos[i] + new Vector3(i, j, 0);
+                    if(!InRange((int)CurShapePos.x,(int)CurShapePos.y)) break;
+                    if(!Possible((int)CurShapePos.x,(int)CurShapePos.y)) break;
+                    ++count;
+                }
+
+                if (count == ShapePos.Length) return true;
+            }
+        }
+
+        return false;
+    }
+    
+    
+    
+    
+    
+    
+    
 }

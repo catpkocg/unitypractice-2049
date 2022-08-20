@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class Node : MonoBehaviour
 {
-    public bool value = true;
-    public Vector2 Pos => transform.position;
-    
-    public 
+    private Vector3 NodePos => transform.position;
     // Start is called before the first frame update
     void Start()
     {

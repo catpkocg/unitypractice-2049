@@ -4,14 +4,21 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
-    public Vector2 Pos => transform.position;
-    
-    
 
+    public Vector3[] ShapePos;
+    GameManager GM;
+    private Vector3 BlockPos;
     // Start is called before the first frame update
     void Start()
     {
-        
+        BlockPos = transform.parent.position;
+        GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+
+        ShapePos = new Vector3[transform.childCount];
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            ShapePos[i] = transform.GetChild(i).localPosition;
+        }
     }
 
     // Update is called once per frame
