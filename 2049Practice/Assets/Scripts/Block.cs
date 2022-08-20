@@ -26,4 +26,24 @@ public class Block : MonoBehaviour
     {
         
     }
+
+    void MoveR()
+    {
+        
+    }
+
+    void MoveL()
+    {
+        
+    }
+
+    void MoveU()
+    {
+        
+    }
+
+    void MoveD()
+    {
+        
+    }
 }
