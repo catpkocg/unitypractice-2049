@@ -42,6 +42,9 @@ public class GameManager : MonoBehaviour
     }
 
     // Update is called once per frame
+    
+    
+    //생성할때 그리드추가 + 블락 번호 생성
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -51,7 +54,7 @@ public class GameManager : MonoBehaviour
             
             if (CanSpawn(RandomBlock))
             {
-                SpawnBlock();
+               // SpawnBlock();
                 
             }
             else
@@ -159,7 +162,7 @@ public class GameManager : MonoBehaviour
     }
     */
 
-    void SpawnBlock()
+    /*void SpawnBlock()
     {
         int random = Random.Range(0, Blocks.Length);
         var RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
@@ -169,7 +172,7 @@ public class GameManager : MonoBehaviour
             {
                 Vector3 vaildPos = new Vector3(x, j, 0);
 
-                if (!IsValidPosition(RandomBlock,vaildPos))
+                if (!IsValidPosition(RandomBlock))
                 {
                     Instantiate(Blocks[random], vaildPos, Quaternion.identity);
                 }
@@ -182,7 +185,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-    }
+    }*/
 
     public bool IsValidPosition(Vector3[] ShapePos)
     {
@@ -190,7 +193,7 @@ public class GameManager : MonoBehaviour
         // The position is only valid if every cell is valid
         for (int i = 0; i < ShapePos.Length; i++)
         {
-            Vector3 Position = ShapePos[i]
+            Vector3 Position = ShapePos[i];
 
             if (!InRange((int)Position.x, (int)Position.y))
             {
@@ -211,6 +214,7 @@ public class GameManager : MonoBehaviour
     {
         int random = Random.Range(0, Blocks.Length);
         var RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
+        
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
