@@ -50,7 +50,15 @@ public class GameManager : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Space))
         {
             var Cute = Blocks[0].GetComponent<Block>().ShapePos;
-            CanSpawn(Cute);
+            if (!CanSpawn(Cute))
+            {
+                GameOver();
+            }
+            else
+            {
+                SpawnBlock();
+            }
+            
         }
     }
     void GenerateGrid()
@@ -62,14 +70,17 @@ public class GameManager : MonoBehaviour
                 var node = Instantiate(nodePrefab, new Vector2(x, y), Quaternion.identity);
                 node.transform.SetParent(BASE.transform);
                 Nodes.Add(node);
-                
-                
             }
         }
 
         var center = new Vector2((float)width / 2 - 0.5f, (float)height / 2 - 0.5f);
         Camera.main.transform.position = new Vector3(center.x, center.y, -10);
 
+    }
+
+    void GameOver()
+    {
+        Debug.Log("Game Over");
     }
 
     bool InRange(int x, int y)
@@ -120,20 +131,53 @@ public class GameManager : MonoBehaviour
         
         return false;
     }
-    //랜덤블럭 재생성.
+    //만약 값이 false면 게임 오버.
+
 
     void SpawnBlock()
+
     {
         /*all check
             if 오른쪽 왼쪽 다 0 이면 그자리에 Instantiate
             생성후 1로 바꿔주기.
             */
+
+        int random = Random.Range(0, Blocks.Length);
+
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+
+                var ShapePos = Blocks[random].GetComponent<Block>().ShapePos;
+                List<Vector3> GoodPos = new List<Vector3>();
+                
+                for (int k = 0; k < ShapePos.Length; k++)
+                {
+                    Vector3 CurShapePos = ShapePos[i] + new Vector3(i, j, 0);
+                    if(!InRange((int)CurShapePos.x,(int)CurShapePos.y)) break;
+                    if(!Possible((int)CurShapePos.x,(int)CurShapePos.y)) break;
+                    
+                    GoodPos.Add(ShapePos[0]+new Vector3(i,j,0));
+                }
+
+                
+            }
+
+        }
         
+        var Proper = GoodPos[0];
+        var Pos = Blocks[random].GetComponent<Block>().ShapePos;
+        Instantiate(Blocks[random], Proper, Quaternion.identity);
+        for (int i = 0; i < Pos.Length; i++)
+        {
+            Vector3 SumPos = Pos[i] + Proper;
+            Array[(int)SumPos.x, (int)SumPos.y] = 1;
+        }
+
+
     }
 
 
-    
-    
-    
-    
+
 }
