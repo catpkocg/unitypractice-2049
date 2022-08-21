@@ -51,11 +51,12 @@ public class GameManager : MonoBehaviour
             
             if (CanSpawn(RandomBlock))
             {
-                GameOver();
+                SpawnBlock();
+                
             }
             else
             {
-                SpawnBlock();
+                GameOver();
             }
 
         }
@@ -183,13 +184,13 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public bool IsValidPosition(Vector3[] ShapePos, Vector3 pos)
+    public bool IsValidPosition(Vector3[] ShapePos)
     {
 
         // The position is only valid if every cell is valid
         for (int i = 0; i < ShapePos.Length; i++)
         {
-            Vector3 Position = ShapePos[i] + pos;
+            Vector3 Position = ShapePos[i]
 
             if (!InRange((int)Position.x, (int)Position.y))
             {
@@ -204,6 +205,22 @@ public class GameManager : MonoBehaviour
 
         return true;
 
+    }
+
+    void FindValidPlace()
+    {
+        int random = Random.Range(0, Blocks.Length);
+        var RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                Vector3 place = new Vector3(x, y, 0);
+                List<Vector3> validPlaces = new List<Vector3>();
+                
+                
+            }
+        }
     }
 }
 
