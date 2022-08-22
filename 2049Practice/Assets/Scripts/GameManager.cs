@@ -29,16 +29,10 @@ public class GameManager : MonoBehaviour
         Array[3, 3] = 1;
         Array[2, 3] = 1;
         Array[4, 3] = 1;
-        //초기 array 값은 모두 0;
-        // block 위치대로 array 값 1 주기.
 
-        //블락별로 index 다르게 주기
-        //점수에 영향
 
         GenerateGrid();
-        Debug.Log(Nodes[1].Pos);
-        Debug.Log(Nodes[2].Pos);
-        Debug.Log(Nodes[64].Pos);
+
     }
 
     // Update is called once per frame
@@ -49,21 +43,14 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            int random = Random.Range(0, Blocks.Length);
-            var RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
-            
-            if (CanSpawn(RandomBlock))
-            {
-               // SpawnBlock();
+
+            SpawnBlock();
+            Array[7, 7] = 1;
                 
-            }
-            else
-            {
-                GameOver();
-            }
 
         }
     }
+
 
     void GenerateGrid()
     {
@@ -78,16 +65,20 @@ public class GameManager : MonoBehaviour
         }
 
         var center = new Vector2((float)width / 2 - 0.5f, (float)height / 2 - 0.5f);
-        Camera.main.transform.position = new Vector3(center.x, center.y, -10);
 
-
-
+        Camera.main.transform.position = new Vector3(center.x, center.y, -20);
     }
 
     void GameOver()
     {
+        GameObject[] Blocks = GameObject.FindGameObjectsWithTag("Block");   
+        foreach(GameObject block in Blocks)  
+        {
+	            GameObject.Destroy(block);
+        }
         Debug.Log("Game Over");
     }
+
 
     bool InRange(int x, int y)
     {
@@ -99,6 +90,7 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
+
     bool Possible(int x, int y)
     {
         if (Array[x, y] != 0)
@@ -109,23 +101,22 @@ public class GameManager : MonoBehaviour
         return true;
     }
 
-    //랜덤 블락 고른후에 대입. 
-    bool CanSpawn(Vector3[] ShapePos)
+    bool CanSpawn(Vector3[] RandomBlock)
     {
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
                 int count = 0;
-                for (int k = 0; k < ShapePos.Length; k++)
+                for (int k = 0; k < RandomBlock.Length; k++)
                 {
-                    Vector3 CurShapePos = ShapePos[k] + new Vector3(i, j, 0);
+                    Vector3 CurShapePos = RandomBlock[k] + new Vector3(i, j, 0);
                     if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
                     if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
                     ++count;
                 }
 
-                if (count == ShapePos.Length)
+                if (count == RandomBlock.Length)
                 {
                     return true;
                 }
@@ -136,96 +127,72 @@ public class GameManager : MonoBehaviour
     }
 
 
-    /*
-    bool IsValid(Vector3[] ShapePos)
-    {
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                int count = 0;
-                for (int k = 0; k < ShapePos.Length; k++)
-                {
-                    Vector3 CurShapePos = ShapePos[k] + new Vector3(i,j,0);
-                    if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
-                    if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
-                    ++count;
-                }
-
-                if (count == ShapePos.Length)
-                {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    */
-
-    /*void SpawnBlock()
+    void SpawnBlock()
     {
         int random = Random.Range(0, Blocks.Length);
-        var RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
-        for (int x = 0; x < width; x++)
+        int randomX = Random.Range(0, 7);
+        int randomY = Random.Range(0, 7);
+        var randomPos = new Vector3(randomX, randomY, 0);
+
+        Vector3[] RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
+        //List<Vector3> validPlaces = new List<Vector3>();
+
+        if(CanSpawn(RandomBlock) == false)
         {
-            for (int j = 0; j < height; j++)
+            GameOver();
+            for(int x = 0; x < width; x++)
             {
-                Vector3 vaildPos = new Vector3(x, j, 0);
-
-                if (!IsValidPosition(RandomBlock))
+                for(int y = 0; y < height; y++)
                 {
-                    Instantiate(Blocks[random], vaildPos, Quaternion.identity);
-                }
-
-                for (int i = 0; i < RandomBlock.Length; i++)
-                {
-                    Vector3 Save = RandomBlock[i] + vaildPos;
-                    Array[(int)Save.x, (int)Save.y] = 1;
+                    Array[x, y] = 1;
                 }
             }
         }
 
-    }*/
-
-    public bool IsValidPosition(Vector3[] ShapePos)
-    {
-
-        // The position is only valid if every cell is valid
-        for (int i = 0; i < ShapePos.Length; i++)
+        else
         {
-            Vector3 Position = ShapePos[i];
+            List<Vector3> validPlaces = new List<Vector3>();
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    int count = 0;
 
-            if (!InRange((int)Position.x, (int)Position.y))
-            {
-                return false;
+                    for (int k = 0; k < RandomBlock.Length; k++)
+                    {
+                        Vector3 CurShapePos = RandomBlock[k] + new Vector3(i, j, 0);
+                        if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
+                        if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
+                        ++count;
+
+                    }
+
+                    if (count == RandomBlock.Length)
+                    {
+                        validPlaces.Add(new Vector3(i, j, 0));
+                    }
+
+                }
             }
-            
-            if (!Possible((int)Position.x, (int)Position.y))
+
+
+            var SpawnPos = validPlaces[0];
+
+
+            Debug.Log(SpawnPos);
+
+            Instantiate(Blocks[random], SpawnPos, Quaternion.identity);
+
+            for (int k = 0; k < RandomBlock.Length; k++)
             {
-                return false;
+                Vector3 getposition = RandomBlock[k] + SpawnPos;
+                Array[(int)getposition.x, (int)getposition.y] = 1;
             }
         }
 
-        return true;
 
     }
 
-    void FindValidPlace()
-    {
-        int random = Random.Range(0, Blocks.Length);
-        var RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
-        
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                Vector3 place = new Vector3(x, y, 0);
-                List<Vector3> validPlaces = new List<Vector3>();
-                
-                
-            }
-        }
-    }
 }
 
 

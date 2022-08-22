@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 3385083957550078511}
   m_Layer: 0
   m_Name: Block1
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -131,7 +131,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8353667b4d752eb4e91801ec8eac2632, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShapePos: []
+  ShapePos:
+  - {x: 0, y: 0, z: 0}
+  - {x: 1, y: 0, z: 0}
+  - {x: -1, y: 0, z: 0}
 --- !u!1 &5824095473378906151
 GameObject:
   m_ObjectHideFlags: 0

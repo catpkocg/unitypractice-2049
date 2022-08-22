@@ -5,9 +5,13 @@ using UnityEngine;
 public class Block : MonoBehaviour
 {
 
+    [SerializeField] private int width = 8;
+    [SerializeField] private int height = 8;
+
     public Vector3[] ShapePos;
     GameManager GM;
     private Vector3 BlockPos;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,37 +25,22 @@ public class Block : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
+
+/*    void MoveR()
     {
-        
-    }
-    
-    // 0 0 0 0 0 0 0  0
-    // 0 0 0 0 9 9 0  0
-    // 0 0 0 0 9 0 0  0
-    // 0 0 0 0 0 0 0  0
-    // 0 0 0 0 0 0 0  0
-    
-    //블락에 그리드추가. 이동할수있을때까지 이동. (바운드, 블락 그리드 만나면 스탑.) (all block 반복)
-    
-    void MoveR()
-    {
-        
+        for(int x = 7; x < 0; x--)
+        {
+            for(int y = 0; y < height; y++)
+            {
+                if()
+
+                for()
+            }
+        }
     }
 
-    void MoveL()
+    void canMove()
     {
-        
-    }
 
-    void MoveU()
-    {
-        
-    }
-
-    void MoveD()
-    {
-        
-    }
+    }*/
 }
