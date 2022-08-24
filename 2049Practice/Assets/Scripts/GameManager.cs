@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -19,6 +20,7 @@ public class GameManager : MonoBehaviour
 
     private Vector3 Pos;
     private Vector2[] BlockShape;
+    public List<GameObject> MoveBlocks;
 
     public List<Vector3> Good = new List<Vector3>();
 
@@ -45,8 +47,12 @@ public class GameManager : MonoBehaviour
         {
 
             SpawnBlock();
-            Array[7, 7] = 1;
-                
+            
+        }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+
+            MoveRight();
 
         }
     }
@@ -181,7 +187,8 @@ public class GameManager : MonoBehaviour
 
             Debug.Log(SpawnPos);
 
-            Instantiate(Blocks[random], SpawnPos, Quaternion.identity);
+            var moveBlock = Instantiate(Blocks[random], SpawnPos, Quaternion.identity);
+            MoveBlocks.Add(moveBlock);
 
             for (int k = 0; k < RandomBlock.Length; k++)
             {
@@ -192,6 +199,63 @@ public class GameManager : MonoBehaviour
 
 
     }
+    private void HardRight()
+    {
+        
+
+    }
+    void MoveRight()
+    {
+        List<Vector3> MovingBlocks = new List<Vector3>();
+        
+        for (int i = 0; i < MoveBlocks.Count; i++)
+        {
+
+            var MovingBlock = MoveBlocks[i].GetComponent<Block>().BlockPos;
+            MovingBlocks.Add(MovingBlock);
+        }
+
+        //var blockMove = MovingBlocks.OrderByDescending(x => x.x).ToList();
+        var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.x).ToList();
+        
+        Debug.Log(blockMove[4]);
+
+        for (int k = 0; k < blockMove.Count; k++)
+        {
+            Vector3 newPosition = blockMove[k].transform.position;
+            
+            while (Move(Vector3.right, newPosition)) {
+                continue;
+            }
+            
+        }
+
+    }
+    
+    private bool Move(Vector3 translation, Vector3 position)
+    {
+        Vector3 newPosition = position;
+        newPosition.x += translation.x;
+        newPosition.y += translation.y;
+
+        bool valid = InRange((int)newPosition.x, (int)newPosition.y) &&
+                     Possible((int)newPosition.x, (int)newPosition.y);
+
+        // Only save the movement if the new position is valid
+        if (valid)
+        {
+            position = newPosition;
+        }
+
+        return valid;
+    }
+
+    
+    
+    
+    
+    
+    
 
 }
 

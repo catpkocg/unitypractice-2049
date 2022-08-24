@@ -10,7 +10,8 @@ public class Block : MonoBehaviour
 
     public Vector3[] ShapePos;
     GameManager GM;
-    private Vector3 BlockPos;
+    public Vector3 Pos => transform.position;
+    public Vector3 BlockPos;
 
     // Start is called before the first frame update
     void Start()
