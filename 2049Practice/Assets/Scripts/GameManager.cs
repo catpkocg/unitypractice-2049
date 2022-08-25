@@ -184,8 +184,9 @@ public class GameManager : MonoBehaviour
                 }
             }
 
-
-            var SpawnPos = validPlaces[0];
+            int randomSpawn = Random.Range(0, validPlaces.Count);
+            
+            var SpawnPos = validPlaces[randomSpawn];
 
 
             Debug.Log(SpawnPos);
