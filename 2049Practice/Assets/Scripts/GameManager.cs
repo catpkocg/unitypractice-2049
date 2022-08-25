@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 
 public class GameManager : MonoBehaviour
@@ -25,41 +27,32 @@ public class GameManager : MonoBehaviour
 
     public List<Vector3> Good = new List<Vector3>();
 
-    // Start is called before the first frame update
     void Start()
     {
-        Instantiate(Blocks[0], new Vector3(3, 3, 0), Quaternion.identity);
-        Array[3, 3] = 1;
-        Array[2, 3] = 1;
-        Array[4, 3] = 1;
-
-
         GenerateGrid();
-
     }
-
-    // Update is called once per frame
-
-
-    //생성할때 그리드추가 + 블락 번호 생성
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-
             SpawnBlock();
-
         }
 
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-
             MoveRight();
-
+        }else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            MoveLeft();
+        }else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            MoveUp();
+        }else if(Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            MoveDown();
         }
+        
     }
-
-
     void GenerateGrid()
     {
         for (int x = 0; x < width; x++)
@@ -87,8 +80,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Game Over");
     }
-
-
+    
     bool InRange(int x, int y)
     {
         if (x < 0 || y < 0 || x >= width || y >= height)
@@ -98,8 +90,7 @@ public class GameManager : MonoBehaviour
 
         return true;
     }
-
-
+    
     bool Possible(int x, int y)
     {
         if (Array[x, y] != 0)
@@ -134,8 +125,7 @@ public class GameManager : MonoBehaviour
 
         return false;
     }
-
-
+    
     void SpawnBlock()
     {
         int random = Random.Range(0, Blocks.Length);
@@ -144,7 +134,6 @@ public class GameManager : MonoBehaviour
         var randomPos = new Vector3(randomX, randomY, 0);
 
         Vector3[] RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
-        //List<Vector3> validPlaces = new List<Vector3>();
 
         if (CanSpawn(RandomBlock) == false)
         {
@@ -185,12 +174,9 @@ public class GameManager : MonoBehaviour
             }
 
             int randomSpawn = Random.Range(0, validPlaces.Count);
-            
+
             var SpawnPos = validPlaces[randomSpawn];
-
-
-            Debug.Log(SpawnPos);
-
+            
             var moveBlock = Instantiate(Blocks[random], SpawnPos, Quaternion.identity);
             MoveBlocks.Add(moveBlock);
 
@@ -203,13 +189,174 @@ public class GameManager : MonoBehaviour
 
 
     }
-
-    private void HardRight()
+    
+    void MoveUp()
     {
+        List<Vector3> MovingBlocks = new List<Vector3>();
 
+        for (int i = 0; i < MoveBlocks.Count; i++)
+        {
 
+            var MovingBlock = MoveBlocks[i].GetComponent<Block>().BlockPos;
+            MovingBlocks.Add(MovingBlock);
+
+        }
+
+        var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.y).ToList();
+
+        List<Vector3> goPos = new List<Vector3>();
+
+        for (int k = 0; k < blockMove.Count; k++)
+        {
+            var presentPos = blockMove[k].transform.position;
+            
+            var nn = blockMove[0].GetComponent<Block>().ShapePos;
+
+            var Arraychange = blockMove[k].GetComponent<Block>().ShapePos;
+
+            for (int n = 0; n < Arraychange.Length; n++)
+            {
+                Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
+                    (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
+            }
+
+            int current = (int)presentPos.y;
+            Vector3 goodPos = presentPos;
+            for (int i = current; i < height; i++)
+            {
+                var position = new Vector3(presentPos.x, i, 0);
+                if (IsValidPosition(blockMove[k], position))
+                {
+                    goodPos = position;
+                }
+                else
+                {
+                    break;    
+                }
+            
+            } goPos.Add(goodPos);
+            
+            blockMove[k].transform.DOMove(goPos[k], 0.2f);
+            
+
+            for (int n = 0; n < Arraychange.Length; n++)
+            {
+                Array[(int)goPos[k].x + (int)Arraychange[n].x,
+                    (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+            }
+        }
     }
+    void MoveDown()
+    {
+        List<Vector3> MovingBlocks = new List<Vector3>();
 
+        for (int i = 0; i < MoveBlocks.Count; i++)
+        {
+
+            var MovingBlock = MoveBlocks[i].GetComponent<Block>().BlockPos;
+            MovingBlocks.Add(MovingBlock);
+
+        }
+
+        var blockMove = MoveBlocks.OrderBy(b => b.transform.position.y).ToList();
+
+        List<Vector3> goPos = new List<Vector3>();
+
+        for (int k = 0; k < blockMove.Count; k++)
+        {
+            var presentPos = blockMove[k].transform.position;
+            
+            var nn = blockMove[0].GetComponent<Block>().ShapePos;
+
+            var Arraychange = blockMove[k].GetComponent<Block>().ShapePos;
+
+            for (int n = 0; n < Arraychange.Length; n++)
+            {
+                Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
+                    (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
+            }
+
+            int current = (int)presentPos.y;
+            Vector3 goodPos = presentPos;
+            for (int i = current; i >= 0; i--)
+            {
+                var position = new Vector3(presentPos.x, i, 0);
+                if (IsValidPosition(blockMove[k], position))
+                {
+                    goodPos = position;
+                }
+                else
+                {
+                    break;    
+                }
+            
+            } goPos.Add(goodPos);
+            
+            blockMove[k].transform.DOMove(goPos[k], 0.2f);
+
+            for (int n = 0; n < Arraychange.Length; n++)
+            {
+                Array[(int)goPos[k].x + (int)Arraychange[n].x,
+                    (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+            }
+        }
+    }
+    void MoveLeft()
+    {
+        List<Vector3> MovingBlocks = new List<Vector3>();
+
+        for (int i = 0; i < MoveBlocks.Count; i++)
+        {
+
+            var MovingBlock = MoveBlocks[i].GetComponent<Block>().BlockPos;
+            MovingBlocks.Add(MovingBlock);
+
+        }
+
+        var blockMove = MoveBlocks.OrderBy(b => b.transform.position.x).ToList();
+
+        List<Vector3> goPos = new List<Vector3>();
+
+        for (int k = 0; k < blockMove.Count; k++)
+        {
+            var presentPos = blockMove[k].transform.position;
+            
+            var nn = blockMove[0].GetComponent<Block>().ShapePos;
+
+            var Arraychange = blockMove[k].GetComponent<Block>().ShapePos;
+
+            for (int n = 0; n < Arraychange.Length; n++)
+            {
+                Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
+                    (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
+            }
+
+            int current = (int)presentPos.x;
+            Vector3 goodPos = presentPos;
+            for (int i = current; i >= 0; i--)
+            {
+                var position = new Vector3(i, presentPos.y, 0);
+                if (IsValidPosition(blockMove[k], position))
+                {
+                    goodPos = position;
+                }
+                else
+                {
+                    break;    
+                }
+            
+            } goPos.Add(goodPos);
+            
+            blockMove[k].transform.DOMove(goPos[k], 0.2f);
+
+            for (int n = 0; n < Arraychange.Length; n++)
+            {
+                Array[(int)goPos[k].x + (int)Arraychange[n].x,
+                    (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+            }
+        }
+    }
+    
     void MoveRight()
     {
         List<Vector3> MovingBlocks = new List<Vector3>();
@@ -222,99 +369,77 @@ public class GameManager : MonoBehaviour
 
         }
 
-        //var blockMove = MovingBlocks.OrderByDescending(x => x.x).ToList();
         var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.x).ToList();
 
-        //Debug.Log(blockMove[4]);
-
-
-        bool valid = InRange((int)blockMove[0].transform.position.x, (int)blockMove[0].transform.position.y) &&
-                     Possible((int)blockMove[0].transform.position.x, (int)blockMove[0].transform.position.y);
-
-
-        var nn = blockMove[0].GetComponent<Block>().ShapePos;
-
-        for (int n = 0; n < nn.Length; n++)
-        {
-            Array[(int)blockMove[0].transform.position.x + (int)nn[n].x,
-                (int)blockMove[0].transform.position.y + (int)nn[n].y] = 0;
-        }
-
-        var presentPos = blockMove[0].transform.position;
-
-        presentPos = blockMove[0].transform.position + new Vector3(1, 0, 0);
-
-
-
-
-
-
-
-
+        List<Vector3> goPos = new List<Vector3>();
 
         for (int k = 0; k < blockMove.Count; k++)
         {
-            var nowposition = blockMove[k].GetComponent<Block>().ShapePos;
+            var presentPos = blockMove[k].transform.position;
+            
+            var nn = blockMove[0].GetComponent<Block>().ShapePos;
 
-            for (int m = 0; m < nowposition.Length; m++)
+            var Arraychange = blockMove[k].GetComponent<Block>().ShapePos;
+
+            for (int n = 0; n < Arraychange.Length; n++)
             {
-                Vector3 CurShapePos = nowposition[m] + blockMove[k].transform.position;
-                if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
-                if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
-
+                Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
+                    (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
             }
 
+            int current = (int)presentPos.x;
+            Vector3 goodPos = presentPos;
+            for (int i = current; i < width; i++)
+            {
+                var position = new Vector3(i, presentPos.y, 0);
+                if (IsValidPosition(blockMove[k], position))
+                {
+                    goodPos = position;
+                }
+                else
+                {
+                    break;    
+                }
+            
+            } goPos.Add(goodPos);
+            
+            blockMove[k].transform.DOMove(goPos[k], 0.2f);
 
+            for (int n = 0; n < Arraychange.Length; n++)
+            {
+                Array[(int)goPos[k].x + (int)Arraychange[n].x,
+                    (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+            }
         }
-
     }
-
-    private bool Move(Vector3 translation, Vector3 position)
-    {
-        Vector3 newPosition = position;
-        newPosition.x += translation.x;
-        newPosition.y += translation.y;
-
-        bool valid = InRange((int)newPosition.x, (int)newPosition.y) &&
-                     Possible((int)newPosition.x, (int)newPosition.y);
-
-        // Only save the movement if the new position is valid
-        if (valid)
-        {
-            position = newPosition;
-        }
-
-        return valid;
-    }
-}
-
-/*
-bool CanMove()
-{
     
-            for (int k = 0; k < RandomBlock.Length; k++)
+    
+    
+    public bool IsValidPosition(GameObject block, Vector3 position)
+    {
+        var Block = block.GetComponent<Block>().ShapePos;
+        
+        // The position is only valid if every cell is valid
+        for (int i = 0; i < Block.Length; i++)
+        {
+            Vector3 nowPosition = Block[i] + position;
+
+            // An out of bounds tile is invalid
+            if (!InRange((int)nowPosition.x, (int)nowPosition.y))
             {
-                Vector3 CurShapePos = RandomBlock[k] + new Vector3(i, j, 0);
-                if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
-                if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
-                ++count;
+                return false;
             }
 
-            if (count == RandomBlock.Length)
-            {
-                return true;
+            if (!Possible((int)nowPosition.x, (int)nowPosition.y)) {
+                return false;
             }
         }
+
+        return true;
     }
 
-    return false;
+    
 }
-*/
-
-
-
-
-
 
 
 
