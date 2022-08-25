@@ -39,8 +39,8 @@ public class GameManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    
-    
+
+
     //생성할때 그리드추가 + 블락 번호 생성
     void Update()
     {
@@ -48,8 +48,9 @@ public class GameManager : MonoBehaviour
         {
 
             SpawnBlock();
-            
+
         }
+
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
 
@@ -78,11 +79,12 @@ public class GameManager : MonoBehaviour
 
     void GameOver()
     {
-        GameObject[] Blocks = GameObject.FindGameObjectsWithTag("Block");   
-        foreach(GameObject block in Blocks)  
+        GameObject[] Blocks = GameObject.FindGameObjectsWithTag("Block");
+        foreach (GameObject block in Blocks)
         {
-	            GameObject.Destroy(block);
+            GameObject.Destroy(block);
         }
+
         Debug.Log("Game Over");
     }
 
@@ -144,12 +146,12 @@ public class GameManager : MonoBehaviour
         Vector3[] RandomBlock = Blocks[random].GetComponent<Block>().ShapePos;
         //List<Vector3> validPlaces = new List<Vector3>();
 
-        if(CanSpawn(RandomBlock) == false)
+        if (CanSpawn(RandomBlock) == false)
         {
             GameOver();
-            for(int x = 0; x < width; x++)
+            for (int x = 0; x < width; x++)
             {
-                for(int y = 0; y < height; y++)
+                for (int y = 0; y < height; y++)
                 {
                     Array[x, y] = 1;
                 }
@@ -200,69 +202,72 @@ public class GameManager : MonoBehaviour
 
 
     }
+
     private void HardRight()
     {
-        
+
 
     }
+
     void MoveRight()
     {
         List<Vector3> MovingBlocks = new List<Vector3>();
-        
+
         for (int i = 0; i < MoveBlocks.Count; i++)
         {
 
             var MovingBlock = MoveBlocks[i].GetComponent<Block>().BlockPos;
             MovingBlocks.Add(MovingBlock);
-            
+
         }
 
         //var blockMove = MovingBlocks.OrderByDescending(x => x.x).ToList();
         var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.x).ToList();
-        
+
         //Debug.Log(blockMove[4]);
-        
-        
+
+
         bool valid = InRange((int)blockMove[0].transform.position.x, (int)blockMove[0].transform.position.y) &&
                      Possible((int)blockMove[0].transform.position.x, (int)blockMove[0].transform.position.y);
-                     
+
 
         var nn = blockMove[0].GetComponent<Block>().ShapePos;
-        
+
         for (int n = 0; n < nn.Length; n++)
         {
-            Array[(int)blockMove[0].transform.position.x + (int)nn[n].x, (int)blockMove[0].transform.position.y + (int)nn[n].y] = 0;
+            Array[(int)blockMove[0].transform.position.x + (int)nn[n].x,
+                (int)blockMove[0].transform.position.y + (int)nn[n].y] = 0;
         }
 
         var presentPos = blockMove[0].transform.position;
-        
-        presentPos =  blockMove[0].transform.position + new Vector3(1, 0, 0);
-        
-        
 
-        
-     
-            
-        
-        
+        presentPos = blockMove[0].transform.position + new Vector3(1, 0, 0);
+
+
+
+
+
+
+
+
 
         for (int k = 0; k < blockMove.Count; k++)
         {
             var nowposition = blockMove[k].GetComponent<Block>().ShapePos;
-            
+
             for (int m = 0; m < nowposition.Length; m++)
             {
                 Vector3 CurShapePos = nowposition[m] + blockMove[k].transform.position;
                 if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
                 if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
-                
+
             }
-            
-            
+
+
         }
 
     }
-    
+
     private bool Move(Vector3 translation, Vector3 position)
     {
         Vector3 newPosition = position;
@@ -280,34 +285,35 @@ public class GameManager : MonoBehaviour
 
         return valid;
     }
+}
 
-    /*bool CanMove()
-    {
-        
-                for (int k = 0; k < RandomBlock.Length; k++)
-                {
-                    Vector3 CurShapePos = RandomBlock[k] + new Vector3(i, j, 0);
-                    if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
-                    if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
-                    ++count;
-                }
+/*bool CanMove()
+{
+    
+            for (int k = 0; k < RandomBlock.Length; k++)
+            {
+                Vector3 CurShapePos = RandomBlock[k] + new Vector3(i, j, 0);
+                if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
+                if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
+                ++count;
+            }
 
-                if (count == RandomBlock.Length)
-                {
-                    return true;
-                }
+            if (count == RandomBlock.Length)
+            {
+                return true;
             }
         }
-
-        return false;
     }
-    
-    
-    
-    
-    
 
+    return false;
 }
+
+
+
+
+
+
+
 
 
 
