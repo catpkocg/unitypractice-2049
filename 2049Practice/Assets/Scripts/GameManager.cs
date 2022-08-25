@@ -287,7 +287,8 @@ public class GameManager : MonoBehaviour
     }
 }
 
-/*bool CanMove()
+/*
+bool CanMove()
 {
     
             for (int k = 0; k < RandomBlock.Length; k++)
@@ -307,8 +308,7 @@ public class GameManager : MonoBehaviour
 
     return false;
 }
-
-
+*/
 
 
 
