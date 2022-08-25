@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private int width = 8;
@@ -213,20 +214,50 @@ public class GameManager : MonoBehaviour
 
             var MovingBlock = MoveBlocks[i].GetComponent<Block>().BlockPos;
             MovingBlocks.Add(MovingBlock);
+            
         }
 
         //var blockMove = MovingBlocks.OrderByDescending(x => x.x).ToList();
         var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.x).ToList();
         
-        Debug.Log(blockMove[4]);
+        //Debug.Log(blockMove[4]);
+        
+        
+        bool valid = InRange((int)blockMove[0].transform.position.x, (int)blockMove[0].transform.position.y) &&
+                     Possible((int)blockMove[0].transform.position.x, (int)blockMove[0].transform.position.y);
+                     
+
+        var nn = blockMove[0].GetComponent<Block>().ShapePos;
+        
+        for (int n = 0; n < nn.Length; n++)
+        {
+            Array[(int)blockMove[0].transform.position.x + (int)nn[n].x, (int)blockMove[0].transform.position.y + (int)nn[n].y] = 0;
+        }
+
+        var presentPos = blockMove[0].transform.position;
+        
+        presentPos =  blockMove[0].transform.position + new Vector3(1, 0, 0);
+        
+        
+
+        
+     
+            
+        
+        
 
         for (int k = 0; k < blockMove.Count; k++)
         {
-            Vector3 newPosition = blockMove[k].transform.position;
+            var nowposition = blockMove[k].GetComponent<Block>().ShapePos;
             
-            while (Move(Vector3.right, newPosition)) {
-                continue;
+            for (int m = 0; m < nowposition.Length; m++)
+            {
+                Vector3 CurShapePos = nowposition[m] + blockMove[k].transform.position;
+                if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
+                if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
+                
             }
+            
             
         }
 
@@ -250,7 +281,26 @@ public class GameManager : MonoBehaviour
         return valid;
     }
 
-    
+    /*bool CanMove()
+    {
+        
+                for (int k = 0; k < RandomBlock.Length; k++)
+                {
+                    Vector3 CurShapePos = RandomBlock[k] + new Vector3(i, j, 0);
+                    if (!InRange((int)CurShapePos.x, (int)CurShapePos.y)) break;
+                    if (!Possible((int)CurShapePos.x, (int)CurShapePos.y)) break;
+                    ++count;
+                }
+
+                if (count == RandomBlock.Length)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     
     
     
