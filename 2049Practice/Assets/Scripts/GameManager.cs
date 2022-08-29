@@ -450,6 +450,7 @@ public class GameManager : MonoBehaviour
         }
         
         List<GameObject> children = new List<GameObject>();
+        
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -457,22 +458,21 @@ public class GameManager : MonoBehaviour
                 if (Array[i, j] == -1)
                 {
                     Array[i, j] = 0;
+                    
                     for (int k = 0; k < MoveBlocks.Count; k++)
                     {
-                        for (int n = MoveBlocks[k].transform.childCount -1 ; n >= 0; n--)
+                        for (int n = MoveBlocks[k].transform.childCount -1; n >= 0; n--)
                         {
                             
                             GameObject child = MoveBlocks[k].transform.GetChild(n).gameObject;
                             
                             if (child.transform.position == new Vector3(i, j, 0))
                             {
-
-                                //children.Add(child);
-                                
-                                MoveBlocks[k].ShapePos.RemoveAt(n);
-               
                                 Destroy(child);
+                                MoveBlocks[k].ShapePos.Remove(new Vector3(i, j, 0)-MoveBlocks[k].Pos);
+
                             }
+                            
                         }
 
                         if (MoveBlocks[k].transform.childCount == 2 &&
@@ -486,6 +486,7 @@ public class GameManager : MonoBehaviour
                         }
 
                     }
+                    
                 }
             }
         }
