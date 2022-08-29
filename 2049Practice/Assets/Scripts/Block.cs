@@ -8,7 +8,7 @@ public class Block : MonoBehaviour
     [SerializeField] private int width = 8;
     [SerializeField] private int height = 8;
 
-    public Vector3[] ShapePos;
+    public List<Vector3> ShapePos;
     GameManager GM;
     public Vector3 Pos => transform.position;
     public Vector3 BlockPos;
@@ -19,29 +19,13 @@ public class Block : MonoBehaviour
         BlockPos = transform.position;
         GM = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
 
-        ShapePos = new Vector3[transform.childCount];
+        ShapePos = new List<Vector3>();
         for (int i = 0; i < transform.childCount; i++)
         {
-            ShapePos[i] = transform.GetChild(i).localPosition;
+            ShapePos.Add(transform.GetChild(i).localPosition);
         }
+
+
     }
 
-
-/*    void MoveR()
-    {
-        for(int x = 7; x < 0; x--)
-        {
-            for(int y = 0; y < height; y++)
-            {
-                if()
-
-                for()
-            }
-        }
-    }
-
-    void canMove()
-    {
-
-    }*/
 }

@@ -379,15 +379,16 @@ MonoBehaviour:
   width: 8
   height: 8
   nodePrefab: {fileID: 2919480394338769032, guid: 4edcea2674c1e0b468351b39900184dc, type: 3}
-  Blocks:
-  - {fileID: 5824095472579209100, guid: ae399a92c9b55eb4ca014aa44bb04b57, type: 3}
-  - {fileID: 3617781641730980858, guid: 52dcd69dbd5a8a140bb9bb3c91cd30a1, type: 3}
-  - {fileID: 7016045060748716037, guid: 17caf019c33729949ab112766deeac2b, type: 3}
-  - {fileID: 1904009176300138821, guid: c1c8aa1bed1e44f46bb3068a1ced7d32, type: 3}
-  - {fileID: 2163723996730779836, guid: 80a14e1d3d2ae11468d05360ba841ead, type: 3}
-  - {fileID: 7353891700955699539, guid: 26644909385964d45826572397b486e4, type: 3}
-  Nodes:
-  - {fileID: 0}
-  BlockPos: []
+  BlockPrefabs:
+  - {fileID: 3385083957550078511, guid: ae399a92c9b55eb4ca014aa44bb04b57, type: 3}
+  - {fileID: 8144749376062116246, guid: 52dcd69dbd5a8a140bb9bb3c91cd30a1, type: 3}
+  - {fileID: 5683582324335506011, guid: 17caf019c33729949ab112766deeac2b, type: 3}
+  - {fileID: 4438516549502711718, guid: c1c8aa1bed1e44f46bb3068a1ced7d32, type: 3}
+  - {fileID: 6452948108265561112, guid: 80a14e1d3d2ae11468d05360ba841ead, type: 3}
+  - {fileID: 5791968861483507040, guid: 26644909385964d45826572397b486e4, type: 3}
+  OneBlock:
+  - {fileID: 3702483315501849369, guid: ef546cf107334404c90b231cb55d5b75, type: 3}
+  Nodes: []
   BASE: {fileID: 217717917}
+  MoveBlocks: []
   Good: []
