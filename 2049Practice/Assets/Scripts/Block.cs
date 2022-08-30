@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class Block : MonoBehaviour
 {
-
-    [SerializeField] private int width = 8;
-    [SerializeField] private int height = 8;
-
     public List<Vector3> ShapePos;
     GameManager GM;
     public Vector3 Pos => transform.position;

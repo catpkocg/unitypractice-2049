@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 using Quaternion = UnityEngine.Quaternion;
+using Sequence = DG.Tweening.Sequence;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
@@ -29,37 +30,33 @@ public class GameManager : MonoBehaviour
     private Vector3 Pos;
     private Vector2[] BlockShape;
     public List<Block> MoveBlocks;
-
+    public int LineNums = 0;
     public List<Vector3> Good = new List<Vector3>();
-
+    
+    public bool NeedMove = true;
     void Start()
     {
         GenerateGrid();
+        StartCoroutine(SpawnBlock());
     }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SpawnBlock();
+            StartCoroutine(SpawnBlock());
         }
-
-        if (Input.GetMouseButtonDown(0))
-        {
-            LineClear();
-        }
-
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            MoveRight();
+            StartCoroutine(Right());
         }else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            MoveLeft();
+            StartCoroutine(Left());
         }else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            MoveUp();
+            StartCoroutine(Up());
         }else if(Input.GetKeyDown(KeyCode.DownArrow))
         {
-            MoveDown();
+            StartCoroutine(Down());
         }
         
     }
@@ -135,7 +132,7 @@ public class GameManager : MonoBehaviour
         return false;
     }
     
-    void SpawnBlock()
+    IEnumerator SpawnBlock()
     {
         var random = Random.Range(0, BlockPrefabs.Length);
         var randomX = Random.Range(0, 7);
@@ -196,25 +193,15 @@ public class GameManager : MonoBehaviour
             }
         }
 
-
+        yield return null;
     }
     
-    void MoveUp()
+    IEnumerator MoveUp()
     {
-        List<Vector3> MovingBlocks = new List<Vector3>();
-
-        for (int i = 0; i < MoveBlocks.Count; i++)
-        {
-
-            var MovingBlock = MoveBlocks[i].BlockPos;
-            MovingBlocks.Add(MovingBlock);
-
-        }
-
         var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.y).ToList();
-
+        
         List<Vector3> goPos = new List<Vector3>();
-
+        
         for (int k = 0; k < blockMove.Count; k++)
         {
             var presentPos = blockMove[k].transform.position;
@@ -245,7 +232,7 @@ public class GameManager : MonoBehaviour
             
             } goPos.Add(goodPos);
             
-            blockMove[k].transform.DOMove(goPos[k], 0.2f);
+            blockMove[k].transform.DOMove(goPos[k], 0.1f).SetEase(Ease.OutCubic);
             
 
             for (int n = 0; n < Arraychange.Count; n++)
@@ -254,19 +241,11 @@ public class GameManager : MonoBehaviour
                     (int)goPos[k].y + (int)Arraychange[n].y] = 1;
             }
         }
+        yield return null;
     }
-    void MoveDown()
+    IEnumerator MoveDown()
     {
-        List<Vector3> MovingBlocks = new List<Vector3>();
-
-        for (int i = 0; i < MoveBlocks.Count; i++)
-        {
-
-            var MovingBlock = MoveBlocks[i].BlockPos;
-            MovingBlocks.Add(MovingBlock);
-
-        }
-
+        
         var blockMove = MoveBlocks.OrderBy(b => b.transform.position.y).ToList();
 
         List<Vector3> goPos = new List<Vector3>();
@@ -301,7 +280,7 @@ public class GameManager : MonoBehaviour
             
             } goPos.Add(goodPos);
             
-            blockMove[k].transform.DOMove(goPos[k], 0.2f);
+            blockMove[k].transform.DOMove(goPos[k], 0.1f).SetEase(Ease.OutCubic);
 
             for (int n = 0; n < Arraychange.Count; n++)
             {
@@ -309,18 +288,10 @@ public class GameManager : MonoBehaviour
                     (int)goPos[k].y + (int)Arraychange[n].y] = 1;
             }
         }
+        yield return null;
     }
-    void MoveLeft()
+    IEnumerator MoveLeft()
     {
-        List<Vector3> MovingBlocks = new List<Vector3>();
-
-        for (int i = 0; i < MoveBlocks.Count; i++)
-        {
-
-            var MovingBlock = MoveBlocks[i].BlockPos;
-            MovingBlocks.Add(MovingBlock);
-
-        }
 
         var blockMove = MoveBlocks.OrderBy(b => b.transform.position.x).ToList();
 
@@ -329,8 +300,6 @@ public class GameManager : MonoBehaviour
         for (int k = 0; k < blockMove.Count; k++)
         {
             var presentPos = blockMove[k].transform.position;
-            
-            var nn = blockMove[0].ShapePos;
 
             var Arraychange = blockMove[k].ShapePos;
 
@@ -356,28 +325,19 @@ public class GameManager : MonoBehaviour
             
             } goPos.Add(goodPos);
             
-            blockMove[k].transform.DOMove(goPos[k], 0.2f);
-
+            blockMove[k].transform.DOMove(goPos[k], 0.1f).SetEase(Ease.OutCubic);
             for (int n = 0; n < Arraychange.Count; n++)
             {
                 Array[(int)goPos[k].x + (int)Arraychange[n].x,
                     (int)goPos[k].y + (int)Arraychange[n].y] = 1;
             }
         }
+        yield return null;
     }
     
-    void MoveRight()
+    IEnumerator MoveRight()
     {
-        List<Vector3> MovingBlocks = new List<Vector3>();
-
-        for (int i = 0; i < MoveBlocks.Count; i++)
-        {
-
-            var MovingBlock = MoveBlocks[i].BlockPos;
-            MovingBlocks.Add(MovingBlock);
-
-        }
-
+        
         var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.x).ToList();
 
         List<Vector3> goPos = new List<Vector3>();
@@ -409,8 +369,8 @@ public class GameManager : MonoBehaviour
                 }
             
             } goPos.Add(goodPos);
-            
-            blockMove[k].transform.DOMove(goPos[k], 0.2f);
+
+            blockMove[k].transform.DOMove(goPos[k], 0.1f).SetEase(Ease.OutCubic);
 
             for (int n = 0; n < Arraychange.Count; n++)
             {
@@ -418,14 +378,13 @@ public class GameManager : MonoBehaviour
                     (int)goPos[k].y + (int)Arraychange[n].y] = 1;
             }
         }
-        
-        
+
+        yield return null;
     }
 
-    public void LineClear()
+    IEnumerator CheckLineV()
     {
         int oneLine = 0;
-
         for (int i= 0; i < width; i++)
         {
             int verticalCount = 0;
@@ -436,7 +395,6 @@ public class GameManager : MonoBehaviour
                     ++verticalCount;
                 }
             }
-            
             if (verticalCount == 8)
             {
                 ++oneLine;
@@ -444,13 +402,41 @@ public class GameManager : MonoBehaviour
                 {
                     Array[i, j] = -1;
                 }
-                Debug.Log(oneLine);
-                
             }
+            LineNums = oneLine;
         }
-        
-        List<GameObject> children = new List<GameObject>();
-        
+        yield return null;
+    }
+    
+    IEnumerator CheckLineH()
+    {
+        int oneLine = 0;
+        for (int i= 0; i < height; i++)
+        {
+            int HorizonCount = 0;
+            for (int j = 0; j < width; j++) 
+            {
+                if (Array[j, i] != 0)
+                {
+                    ++HorizonCount;
+                }
+            }
+            if (HorizonCount == 8)
+            {
+                ++oneLine;
+                for (int j = 0; j < width; j++)
+                {
+                    Array[j, i] = -1;
+                }
+            }
+            LineNums = oneLine;
+        }
+        yield return null;
+    }
+    
+
+    IEnumerator LineClear()
+    {
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -470,28 +456,195 @@ public class GameManager : MonoBehaviour
                             {
                                 Destroy(child);
                                 MoveBlocks[k].ShapePos.Remove(new Vector3(i, j, 0)-MoveBlocks[k].Pos);
-
                             }
-                            
                         }
-
-                        if (MoveBlocks[k].transform.childCount == 2 &&
-                            MoveBlocks[k].ShapePos[0] != new Vector3(0, 0, 0))
-                        {
-                            var one = Instantiate(OneBlock[0], MoveBlocks[k].ShapePos[0], Quaternion.identity);
-                            var two = Instantiate(OneBlock[0], MoveBlocks[k].ShapePos[1], Quaternion.identity);
-                            Destroy(MoveBlocks[k]);
-                            MoveBlocks.Add(one);
-                            MoveBlocks.Add(two);
-                        }
-
                     }
-                    
                 }
             }
         }
+        yield return null;
+    }
+    
+    
 
-        
+    IEnumerator Organize()
+    {
+        for (int n = 0; n < MoveBlocks.Count; n++)
+        {
+            if (MoveBlocks[n].transform.childCount == 0)
+            {
+                Debug.Log("뭐지1");
+                Destroy(MoveBlocks[n].gameObject);
+                MoveBlocks.Remove(MoveBlocks[n]);
+                
+            }
+            
+            else if(MoveBlocks[n].transform.childCount == 2 &&
+                    MoveBlocks[n].ShapePos[0] != new Vector3(0, 0, 0))
+            {
+                Debug.Log("뭐지2");
+                var one = Instantiate(OneBlock[0], MoveBlocks[n].ShapePos[0]+MoveBlocks[n].Pos, Quaternion.identity);
+                var two = Instantiate(OneBlock[0], MoveBlocks[n].ShapePos[1]+MoveBlocks[n].Pos, Quaternion.identity);
+                
+                Destroy(MoveBlocks[n].gameObject);
+                
+                MoveBlocks.Remove(MoveBlocks[n]);
+                
+                MoveBlocks.Add(one);
+                MoveBlocks.Add(two);
+            }
+        }
+        yield return null;
+    }
+
+    IEnumerator Right()
+    {
+        NeedMove = true;
+        yield return StartCoroutine(MoveRight());
+        yield return new WaitForSeconds(0.2f);
+        yield return StartCoroutine(MoveRight());
+        yield return new WaitForSeconds(0.2f);
+        while(NeedMove)
+        {
+            yield return StartCoroutine(CheckLineV());
+            yield return new WaitForSeconds(0.01f);
+            if (LineNums != 0)
+            {
+                yield return StartCoroutine(LineClear());
+                yield return new WaitForSeconds(0.01f);
+                yield return StartCoroutine(Organize());
+                yield return new WaitForSeconds(0.5f);
+                yield return StartCoroutine(MoveRight());
+                yield return new WaitForSeconds(0.2f);
+                yield return StartCoroutine(MoveRight());
+                yield return null;
+            }else if (LineNums == 0)
+            {
+                yield return null;
+                NeedMove = false;
+            }
+        }
+        yield return new WaitForSeconds(0.3f);
+        yield return StartCoroutine(SpawnBlock());
+        yield return null;
+        yield return StartCoroutine(CheckLineH());
+        yield return null;
+        yield return StartCoroutine(LineClear());
+        yield return null;
+        yield return StartCoroutine(Organize());
+    }
+
+    
+    IEnumerator Left()
+    {
+        NeedMove = true;
+        yield return StartCoroutine(MoveLeft());
+        yield return new WaitForSeconds(0.2f);
+        yield return StartCoroutine(MoveLeft());
+        yield return new WaitForSeconds(0.2f);
+        while(NeedMove)
+        {
+            yield return StartCoroutine(CheckLineV());
+            yield return new WaitForSeconds(0.01f);
+            if (LineNums != 0)
+            {
+                yield return StartCoroutine(LineClear());
+                yield return new WaitForSeconds(0.01f);
+                yield return StartCoroutine(Organize());
+                yield return new WaitForSeconds(0.5f);
+                yield return StartCoroutine(MoveLeft());
+                yield return new WaitForSeconds(0.2f);
+                yield return StartCoroutine(MoveLeft());
+                yield return null;
+            }else if (LineNums == 0)
+            {
+                yield return null;
+                NeedMove = false;
+            }
+        }
+        yield return new WaitForSeconds(0.3f);
+        yield return StartCoroutine(SpawnBlock());
+        yield return null;
+        yield return StartCoroutine(CheckLineH());
+        yield return null;
+        yield return StartCoroutine(LineClear());
+        yield return null;
+        yield return StartCoroutine(Organize());
+
+    }
+    IEnumerator Down()
+    {
+        NeedMove = true;
+        yield return StartCoroutine(MoveDown());
+        yield return new WaitForSeconds(0.2f);
+        yield return StartCoroutine(MoveDown());
+        yield return new WaitForSeconds(0.2f);
+        while(NeedMove)
+        {
+            yield return StartCoroutine(CheckLineH());
+            yield return new WaitForSeconds(0.01f);
+            if (LineNums != 0)
+            {
+                yield return StartCoroutine(LineClear());
+                yield return new WaitForSeconds(0.01f);
+                yield return StartCoroutine(Organize());
+                yield return new WaitForSeconds(0.5f);
+                yield return StartCoroutine(MoveDown());
+                yield return new WaitForSeconds(0.2f);
+                yield return StartCoroutine(MoveDown());
+                yield return null;
+            }else if (LineNums == 0)
+            {
+                yield return null;
+                NeedMove = false;
+            }
+        }
+        yield return new WaitForSeconds(0.3f);
+        yield return StartCoroutine(SpawnBlock());
+        yield return null;
+        yield return StartCoroutine(CheckLineV());
+        yield return null;
+        yield return StartCoroutine(LineClear());
+        yield return null;
+        yield return StartCoroutine(Organize());
+
+    }
+    IEnumerator Up()
+    {
+        NeedMove = true;
+        yield return StartCoroutine(MoveUp());
+        yield return new WaitForSeconds(0.2f);
+        yield return StartCoroutine(MoveUp());
+        yield return new WaitForSeconds(0.2f);
+        while(NeedMove)
+        {
+            yield return StartCoroutine(CheckLineH());
+            yield return new WaitForSeconds(0.01f);
+            if (LineNums != 0)
+            {
+                yield return StartCoroutine(LineClear());
+                yield return new WaitForSeconds(0.01f);
+                yield return StartCoroutine(Organize());
+                yield return new WaitForSeconds(0.5f);
+                yield return StartCoroutine(MoveUp());        
+                yield return new WaitForSeconds(0.2f);
+                yield return StartCoroutine(MoveUp());
+                yield return null;
+            }else if (LineNums == 0)
+            {
+                yield return null;
+                NeedMove = false;
+            }
+        }
+        yield return new WaitForSeconds(0.3f);
+        yield return StartCoroutine(SpawnBlock());
+        yield return null;
+        yield return StartCoroutine(CheckLineV());
+        yield return null;
+        yield return StartCoroutine(LineClear());
+        yield return null;
+        yield return StartCoroutine(Organize());
+
     }
     
     
