@@ -32,12 +32,13 @@ public class GameManager : MonoBehaviour
     public List<Block> MoveBlocks;
     public int LineNums = 0;
     public List<Vector3> Good = new List<Vector3>();
-    
-    public bool NeedMove = true;
+
+    public bool NeedMove;
     void Start()
     {
         GenerateGrid();
         StartCoroutine(SpawnBlock());
+        NeedMove = false;
     }
     void Update()
     {
@@ -47,16 +48,32 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            StartCoroutine(Right());
+            if (!NeedMove)
+            {
+                StartCoroutine(Right());
+            }
+            
         }else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            StartCoroutine(Left());
+            if (!NeedMove)
+            {
+                StartCoroutine(Left());
+            }
+            
         }else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            StartCoroutine(Up());
+            if (!NeedMove)
+            {
+                StartCoroutine(Up());
+            }
+            
         }else if(Input.GetKeyDown(KeyCode.DownArrow))
         {
-            StartCoroutine(Down());
+            if (!NeedMove)
+            {
+                StartCoroutine(Down());
+            }
+            
         }
         
     }
@@ -198,6 +215,8 @@ public class GameManager : MonoBehaviour
     
     IEnumerator MoveUp()
     {
+        Sequence S = DOTween.Sequence();
+        
         var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.y).ToList();
         
         List<Vector3> goPos = new List<Vector3>();
@@ -232,7 +251,7 @@ public class GameManager : MonoBehaviour
             
             } goPos.Add(goodPos);
             
-            blockMove[k].transform.DOMove(goPos[k], 0.1f).SetEase(Ease.OutCubic);
+            S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
             
 
             for (int n = 0; n < Arraychange.Count; n++)
@@ -245,7 +264,7 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator MoveDown()
     {
-        
+        Sequence S = DOTween.Sequence();
         var blockMove = MoveBlocks.OrderBy(b => b.transform.position.y).ToList();
 
         List<Vector3> goPos = new List<Vector3>();
@@ -280,7 +299,7 @@ public class GameManager : MonoBehaviour
             
             } goPos.Add(goodPos);
             
-            blockMove[k].transform.DOMove(goPos[k], 0.1f).SetEase(Ease.OutCubic);
+            S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
 
             for (int n = 0; n < Arraychange.Count; n++)
             {
@@ -292,7 +311,8 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator MoveLeft()
     {
-
+        Sequence S = DOTween.Sequence();
+        
         var blockMove = MoveBlocks.OrderBy(b => b.transform.position.x).ToList();
 
         List<Vector3> goPos = new List<Vector3>();
@@ -325,7 +345,8 @@ public class GameManager : MonoBehaviour
             
             } goPos.Add(goodPos);
             
-            blockMove[k].transform.DOMove(goPos[k], 0.1f).SetEase(Ease.OutCubic);
+            S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
+            
             for (int n = 0; n < Arraychange.Count; n++)
             {
                 Array[(int)goPos[k].x + (int)Arraychange[n].x,
@@ -337,6 +358,16 @@ public class GameManager : MonoBehaviour
     
     IEnumerator MoveRight()
     {
+        Sequence S = DOTween.Sequence();
+
+        /*for (int t = 0; t < MoveBlocks.Count; t++)
+        {
+            if (MoveBlocks[t].transform.childCount == 1)
+            {
+                MoveBlocks[t].transform.position = MoveBlocks[t].transform.GetChild(0).transform.position + MoveBlocks[t].transform.position;
+            }
+        }*/
+        
         
         var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.x).ToList();
 
@@ -370,7 +401,7 @@ public class GameManager : MonoBehaviour
             
             } goPos.Add(goodPos);
 
-            blockMove[k].transform.DOMove(goPos[k], 0.1f).SetEase(Ease.OutCubic);
+            S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
 
             for (int n = 0; n < Arraychange.Count; n++)
             {
@@ -378,6 +409,7 @@ public class GameManager : MonoBehaviour
                     (int)goPos[k].y + (int)Arraychange[n].y] = 1;
             }
         }
+        
 
         yield return null;
     }
@@ -501,9 +533,9 @@ public class GameManager : MonoBehaviour
     {
         NeedMove = true;
         yield return StartCoroutine(MoveRight());
-        yield return new WaitForSeconds(0.2f);
-        yield return StartCoroutine(MoveRight());
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.01f);
+        /*yield return StartCoroutine(MoveRight());
+        yield return new WaitForSeconds(0.2f);*/
         while(NeedMove)
         {
             yield return StartCoroutine(CheckLineV());
@@ -520,8 +552,8 @@ public class GameManager : MonoBehaviour
                 yield return null;
             }else if (LineNums == 0)
             {
-                yield return null;
                 NeedMove = false;
+                yield return null;
             }
         }
         yield return new WaitForSeconds(0.3f);
@@ -532,6 +564,8 @@ public class GameManager : MonoBehaviour
         yield return StartCoroutine(LineClear());
         yield return null;
         yield return StartCoroutine(Organize());
+        
+        
     }
 
     
@@ -539,9 +573,9 @@ public class GameManager : MonoBehaviour
     {
         NeedMove = true;
         yield return StartCoroutine(MoveLeft());
-        yield return new WaitForSeconds(0.2f);
-        yield return StartCoroutine(MoveLeft());
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.01f);
+        /*yield return StartCoroutine(MoveLeft());
+        yield return new WaitForSeconds(0.2f);*/
         while(NeedMove)
         {
             yield return StartCoroutine(CheckLineV());
@@ -576,9 +610,9 @@ public class GameManager : MonoBehaviour
     {
         NeedMove = true;
         yield return StartCoroutine(MoveDown());
-        yield return new WaitForSeconds(0.2f);
-        yield return StartCoroutine(MoveDown());
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.01f);
+        /*yield return StartCoroutine(MoveDown());
+        yield return new WaitForSeconds(0.2f);*/
         while(NeedMove)
         {
             yield return StartCoroutine(CheckLineH());
@@ -613,9 +647,9 @@ public class GameManager : MonoBehaviour
     {
         NeedMove = true;
         yield return StartCoroutine(MoveUp());
-        yield return new WaitForSeconds(0.2f);
-        yield return StartCoroutine(MoveUp());
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.01f);
+        /*yield return StartCoroutine(MoveUp());
+        yield return new WaitForSeconds(0.2f);*/
         while(NeedMove)
         {
             yield return StartCoroutine(CheckLineH());
