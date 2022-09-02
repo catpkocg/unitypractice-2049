@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Quaternion = UnityEngine.Quaternion;
+using Random = UnityEngine.Random;
 using Sequence = DG.Tweening.Sequence;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
@@ -39,14 +41,41 @@ public class GameManager : MonoBehaviour
 
     public Text score;
     public int LineScore;
+
+    private float currentTime;
+    public int startSecond;
+    public Text currentTimeText;
+
+    private void Awake()
+    {
+        currentTimeText.text = "Game Over";
+    }
+
     void Start()
     {
         GenerateGrid();
         StartCoroutine(SpawnBlock());
         NeedMove = false;
+        currentTime = 10f;
     }
     void Update()
     {
+        if (currentTime > 0)
+        {
+            currentTime = currentTime - Time.deltaTime;
+            TimeSpan time = TimeSpan.FromSeconds(currentTime);
+            String a = time.Seconds.ToString();
+            String b = (time.Milliseconds/10).ToString();
+            String Timetext = a + "\n" + b;
+            currentTimeText.text = Timetext;
+
+        }
+        else if (currentTime <= 0)
+        {
+            GameOver();
+            currentTimeText.text = "Game Over";
+
+        }
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StartCoroutine(SpawnBlock());
@@ -57,37 +86,24 @@ public class GameManager : MonoBehaviour
             {
                 StartCoroutine(Right());
             }
-            
-            
         }else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (!NeedMove)
             {
                 StartCoroutine(Left());
             }
-            
-            
         }else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             if (!NeedMove)
             {
                 StartCoroutine(Up());
             }
-            
-            
         }else if(Input.GetKeyDown(KeyCode.DownArrow))
         {
             if (!NeedMove)
             {
                 StartCoroutine(Down());
             }
-
-            if (MoveBlocks.Count == 0)
-            {
-                
-            }
-
-
         }
         
     }
@@ -113,6 +129,7 @@ public class GameManager : MonoBehaviour
         foreach (Block block in MoveBlocks)
         {
             Destroy(block.gameObject);
+            MoveBlocks.Remove(block);
         }
 
         Debug.Log("Game Over");
@@ -660,7 +677,7 @@ public class GameManager : MonoBehaviour
     }
 
     
-        IEnumerator Left()
+    IEnumerator Left()
         {
         NeedMove = true;
         yield return StartCoroutine(MoveLeft());
@@ -703,7 +720,7 @@ public class GameManager : MonoBehaviour
         NeedMove = false;
 
         }
-        IEnumerator Down(){
+    IEnumerator Down(){
         
         NeedMove = true;
         yield return StartCoroutine(MoveDown());
