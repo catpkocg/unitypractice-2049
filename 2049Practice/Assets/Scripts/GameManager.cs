@@ -6,6 +6,7 @@ using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Quaternion = UnityEngine.Quaternion;
 using Sequence = DG.Tweening.Sequence;
@@ -34,6 +35,10 @@ public class GameManager : MonoBehaviour
     public List<Vector3> Good = new List<Vector3>();
 
     public bool NeedMove;
+    public bool CanMove;
+
+    public Text score;
+    public int LineScore;
     void Start()
     {
         GenerateGrid();
@@ -53,12 +58,14 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(Right());
             }
             
+            
         }else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (!NeedMove)
             {
                 StartCoroutine(Left());
             }
+            
             
         }else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -67,13 +74,20 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(Up());
             }
             
+            
         }else if(Input.GetKeyDown(KeyCode.DownArrow))
         {
             if (!NeedMove)
             {
                 StartCoroutine(Down());
             }
-            
+
+            if (MoveBlocks.Count == 0)
+            {
+                
+            }
+
+
         }
         
     }
@@ -98,7 +112,7 @@ public class GameManager : MonoBehaviour
     {
         foreach (Block block in MoveBlocks)
         {
-            Destroy(block);
+            Destroy(block.gameObject);
         }
 
         Debug.Log("Game Over");
@@ -215,202 +229,238 @@ public class GameManager : MonoBehaviour
     
     IEnumerator MoveUp()
     {
-        Sequence S = DOTween.Sequence();
         
-        var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.y).ToList();
         
-        List<Vector3> goPos = new List<Vector3>();
+            Sequence S = DOTween.Sequence();
         
-        for (int k = 0; k < blockMove.Count; k++)
-        {
-            var presentPos = blockMove[k].transform.position;
+            var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.y).ToList();
+        
+            List<Vector3> goPos = new List<Vector3>();
+        
+            for (int k = 0; k < blockMove.Count; k++)
+            {
+                var presentPos = blockMove[k].transform.position;
             
-            var nn = blockMove[0].ShapePos;
+                var nn = blockMove[0].ShapePos;
 
-            var Arraychange = blockMove[k].ShapePos;
+                var Arraychange = blockMove[k].ShapePos;
 
-            for (int n = 0; n < Arraychange.Count; n++)
-            {
-                Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
-                    (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
-            }
-
-            int current = (int)presentPos.y;
-            Vector3 goodPos = presentPos;
-            for (int i = current; i < height; i++)
-            {
-                var position = new Vector3(presentPos.x, i, 0);
-                if (IsValidPosition(blockMove[k], position))
+                for (int n = 0; n < Arraychange.Count; n++)
                 {
-                    goodPos = position;
+                    Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
+                        (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
                 }
-                else
+
+                int current = (int)presentPos.y;
+                Vector3 goodPos = presentPos;
+                for (int i = current; i < height; i++)
                 {
-                    break;    
-                }
+                    var position = new Vector3(presentPos.x, i, 0);
+                    if (IsValidPosition(blockMove[k], position))
+                    {
+                        goodPos = position;
+                    }
+                    else
+                    {
+                        break;    
+                    }
             
-            } goPos.Add(goodPos);
+                } goPos.Add(goodPos);
             
-            S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
+                //S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
             
 
-            for (int n = 0; n < Arraychange.Count; n++)
-            {
-                Array[(int)goPos[k].x + (int)Arraychange[n].x,
-                    (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+                for (int n = 0; n < Arraychange.Count; n++)
+                {
+                    Array[(int)goPos[k].x + (int)Arraychange[n].x,
+                        (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+                }
+                IEnumerator Do(int k)
+                {
+                    blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true);
+                    yield return null;
+                }
+
+                StartCoroutine(Do(k));
             }
-        }
+            
+        
         yield return null;
     }
     IEnumerator MoveDown()
     {
-        Sequence S = DOTween.Sequence();
-        var blockMove = MoveBlocks.OrderBy(b => b.transform.position.y).ToList();
+        
+            Sequence S = DOTween.Sequence();
+            var blockMove = MoveBlocks.OrderBy(b => b.transform.position.y).ToList();
 
-        List<Vector3> goPos = new List<Vector3>();
+            List<Vector3> goPos = new List<Vector3>();
 
-        for (int k = 0; k < blockMove.Count; k++)
-        {
-            var presentPos = blockMove[k].transform.position;
-            
-            var nn = blockMove[0].ShapePos;
-
-            var Arraychange = blockMove[k].ShapePos;
-
-            for (int n = 0; n < Arraychange.Count; n++)
+            for (int k = 0; k < blockMove.Count; k++)
             {
-                Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
-                    (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
+                var presentPos = blockMove[k].transform.position;
+            
+                var nn = blockMove[0].ShapePos;
+
+                var Arraychange = blockMove[k].ShapePos;
+
+                for (int n = 0; n < Arraychange.Count; n++)
+                {
+                    Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
+                        (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
+                }
+
+                int current = (int)presentPos.y;
+                Vector3 goodPos = presentPos;
+                for (int i = current; i >= 0; i--)
+                {
+                    var position = new Vector3(presentPos.x, i, 0);
+                    if (IsValidPosition(blockMove[k], position))
+                    {
+                        goodPos = position;
+                    }
+                    else
+                    {
+                        break;    
+                    }
+            
+                } goPos.Add(goodPos);
+            
+                //S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
+
+                for (int n = 0; n < Arraychange.Count; n++)
+                {
+                    Array[(int)goPos[k].x + (int)Arraychange[n].x,
+                        (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+                }
+                
+                IEnumerator Do(int k)
+                {
+                    blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true);
+                    yield return null;
+                }
+
+                StartCoroutine(Do(k));
             }
 
-            int current = (int)presentPos.y;
-            Vector3 goodPos = presentPos;
-            for (int i = current; i >= 0; i--)
-            {
-                var position = new Vector3(presentPos.x, i, 0);
-                if (IsValidPosition(blockMove[k], position))
-                {
-                    goodPos = position;
-                }
-                else
-                {
-                    break;    
-                }
-            
-            } goPos.Add(goodPos);
-            
-            S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
-
-            for (int n = 0; n < Arraychange.Count; n++)
-            {
-                Array[(int)goPos[k].x + (int)Arraychange[n].x,
-                    (int)goPos[k].y + (int)Arraychange[n].y] = 1;
-            }
-        }
+        
         yield return null;
     }
     IEnumerator MoveLeft()
     {
-        Sequence S = DOTween.Sequence();
         
-        var blockMove = MoveBlocks.OrderBy(b => b.transform.position.x).ToList();
+            Sequence S = DOTween.Sequence();
+        
+            var blockMove = MoveBlocks.OrderBy(b => b.transform.position.x).ToList();
 
-        List<Vector3> goPos = new List<Vector3>();
+            List<Vector3> goPos = new List<Vector3>();
 
-        for (int k = 0; k < blockMove.Count; k++)
-        {
-            var presentPos = blockMove[k].transform.position;
-
-            var Arraychange = blockMove[k].ShapePos;
-
-            for (int n = 0; n < Arraychange.Count; n++)
+            for (int k = 0; k < blockMove.Count; k++)
             {
-                Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
-                    (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
+                var presentPos = blockMove[k].transform.position;
+
+                var Arraychange = blockMove[k].ShapePos;
+
+                for (int n = 0; n < Arraychange.Count; n++)
+                {
+                    Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
+                        (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
+                }
+
+                int current = (int)presentPos.x;
+                Vector3 goodPos = presentPos;
+                for (int i = current; i >= 0; i--)
+                {
+                    var position = new Vector3(i, presentPos.y, 0);
+                    if (IsValidPosition(blockMove[k], position))
+                    {
+                        goodPos = position;
+                    }
+                    else
+                    {
+                        break;    
+                    }
+            
+                } goPos.Add(goodPos);
+            
+                //S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
+            
+                for (int n = 0; n < Arraychange.Count; n++)
+                {
+                    Array[(int)goPos[k].x + (int)Arraychange[n].x,
+                        (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+                }
+                
+                IEnumerator Do(int k)
+                {
+                    blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true);
+                    yield return null;
+                }
+
+                StartCoroutine(Do(k));
             }
 
-            int current = (int)presentPos.x;
-            Vector3 goodPos = presentPos;
-            for (int i = current; i >= 0; i--)
-            {
-                var position = new Vector3(i, presentPos.y, 0);
-                if (IsValidPosition(blockMove[k], position))
-                {
-                    goodPos = position;
-                }
-                else
-                {
-                    break;    
-                }
-            
-            } goPos.Add(goodPos);
-            
-            S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
-            
-            for (int n = 0; n < Arraychange.Count; n++)
-            {
-                Array[(int)goPos[k].x + (int)Arraychange[n].x,
-                    (int)goPos[k].y + (int)Arraychange[n].y] = 1;
-            }
-        }
+        
         yield return null;
     }
     
     IEnumerator MoveRight()
     {
-        Sequence S = DOTween.Sequence();
+        
+            Sequence S = DOTween.Sequence();
 
-        /*for (int t = 0; t < MoveBlocks.Count; t++)
-        {
-            if (MoveBlocks[t].transform.childCount == 1)
+            var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.x).ToList();
+
+            List<Vector3> goPos = new List<Vector3>();
+
+            for (int k = 0; k < blockMove.Count; k++)
             {
-                MoveBlocks[t].transform.position = MoveBlocks[t].transform.GetChild(0).transform.position + MoveBlocks[t].transform.position;
-            }
-        }*/
-        
-        
-        var blockMove = MoveBlocks.OrderByDescending(b => b.transform.position.x).ToList();
-
-        List<Vector3> goPos = new List<Vector3>();
-
-        for (int k = 0; k < blockMove.Count; k++)
-        {
-            var presentPos = blockMove[k].transform.position;
+                var presentPos = blockMove[k].transform.position;
             
-            var Arraychange = blockMove[k].ShapePos;
+                var Arraychange = blockMove[k].ShapePos;
 
-            for (int n = 0; n < Arraychange.Count; n++)
-            {
-                Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
-                    (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
-            }
+                for (int n = 0; n < Arraychange.Count; n++)
+                {
+                    Array[(int)blockMove[k].transform.position.x + (int)Arraychange[n].x,
+                        (int)blockMove[k].transform.position.y + (int)Arraychange[n].y] = 0;
+                }
 
-            int current = (int)presentPos.x;
-            Vector3 goodPos = presentPos;
-            for (int i = current; i < width; i++)
-            {
-                var position = new Vector3(i, presentPos.y, 0);
-                if (IsValidPosition(blockMove[k], position))
+                int current = (int)presentPos.x;
+                Vector3 goodPos = presentPos;
+                for (int i = current; i < width; i++)
                 {
-                    goodPos = position;
-                }
-                else
-                {
-                    break;    
-                }
+                    var position = new Vector3(i, presentPos.y, 0);
+                    if (IsValidPosition(blockMove[k], position))
+                    {
+                        goodPos = position;
+                    }
+                    else
+                    {
+                        break;    
+                    }
             
-            } goPos.Add(goodPos);
+                } goPos.Add(goodPos);
 
-            S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
+                //S.Join(blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true));
 
-            for (int n = 0; n < Arraychange.Count; n++)
-            {
-                Array[(int)goPos[k].x + (int)Arraychange[n].x,
-                    (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+                for (int n = 0; n < Arraychange.Count; n++)
+                {
+                    Array[(int)goPos[k].x + (int)Arraychange[n].x,
+                        (int)goPos[k].y + (int)Arraychange[n].y] = 1;
+                }
+                IEnumerator Do(int k)
+                {
+                    blockMove[k].transform.DOMove(goPos[k], 0.1f).SetAutoKill(true);
+                    yield return null;
+                }
+
+                StartCoroutine(Do(k));
             }
-        }
-        
 
+            yield return null;
+    }
+    
+    IEnumerator Do(int i) {
+        
         yield return null;
     }
 
@@ -462,8 +512,18 @@ public class GameManager : MonoBehaviour
                 }
             }
             LineNums = oneLine;
+
+            
+
         }
+        Debug.Log(oneLine);
+        
         yield return null;
+    }
+
+    public void Updatescore(int LineScore)
+    {
+        score.text = "Score : " + LineScore.ToString();
     }
     
 
@@ -487,6 +547,7 @@ public class GameManager : MonoBehaviour
                             if (child.transform.position == new Vector3(i, j, 0))
                             {
                                 Destroy(child);
+                                LineScore += 1;
                                 MoveBlocks[k].ShapePos.Remove(new Vector3(i, j, 0)-MoveBlocks[k].Pos);
                             }
                         }
@@ -494,6 +555,9 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+        
+        Updatescore(LineScore);
+        
         yield return null;
     }
     
@@ -505,16 +569,26 @@ public class GameManager : MonoBehaviour
         {
             if (MoveBlocks[n].transform.childCount == 0)
             {
-                Debug.Log("뭐지1");
+                
                 Destroy(MoveBlocks[n].gameObject);
                 MoveBlocks.Remove(MoveBlocks[n]);
                 
+            }
+
+            else if (MoveBlocks[n].transform.childCount == 1)
+            {
+                var one = Instantiate(OneBlock[0], MoveBlocks[n].ShapePos[0]+MoveBlocks[n].Pos, Quaternion.identity);
+                
+                Destroy(MoveBlocks[n].gameObject);
+
+                MoveBlocks.Remove((MoveBlocks[n]));
+                
+                MoveBlocks.Add(one);
             }
             
             else if(MoveBlocks[n].transform.childCount == 2 &&
                     MoveBlocks[n].ShapePos[0] != new Vector3(0, 0, 0))
             {
-                Debug.Log("뭐지2");
                 var one = Instantiate(OneBlock[0], MoveBlocks[n].ShapePos[0]+MoveBlocks[n].Pos, Quaternion.identity);
                 var two = Instantiate(OneBlock[0], MoveBlocks[n].ShapePos[1]+MoveBlocks[n].Pos, Quaternion.identity);
                 
@@ -533,151 +607,184 @@ public class GameManager : MonoBehaviour
     {
         NeedMove = true;
         yield return StartCoroutine(MoveRight());
-        yield return new WaitForSeconds(0.01f);
-        /*yield return StartCoroutine(MoveRight());
-        yield return new WaitForSeconds(0.2f);*/
-        while(NeedMove)
+        yield return new WaitForEndOfFrame();
+        
+        yield return StartCoroutine(CheckLineV());
+        yield return new WaitForEndOfFrame();
+
+        while (NeedMove)
         {
-            yield return StartCoroutine(CheckLineV());
-            yield return new WaitForSeconds(0.01f);
-            if (LineNums != 0)
+            
+            if(LineNums != 0)
             {
                 yield return StartCoroutine(LineClear());
-                yield return new WaitForSeconds(0.01f);
-                yield return StartCoroutine(Organize());
-                yield return new WaitForSeconds(0.5f);
-                yield return StartCoroutine(MoveRight());
                 yield return new WaitForSeconds(0.2f);
+                Debug.Log("뭐지1");
+                StartCoroutine(Organize());
+                yield return StartCoroutine(Organize());
+                yield return new WaitForEndOfFrame();
+                Debug.Log("뭐지2");
                 yield return StartCoroutine(MoveRight());
-                yield return null;
-            }else if (LineNums == 0)
+                yield return new WaitForEndOfFrame();
+                Debug.Log("뭐지3");
+                yield return StartCoroutine(CheckLineV());
+                yield return new WaitForEndOfFrame();
+                Debug.Log("뭐지4");
+            }
+            
+            if (LineNums == 0)
             {
                 NeedMove = false;
                 yield return null;
+                StopCoroutine(MoveRight());
             }
+            
         }
+        
         yield return new WaitForSeconds(0.3f);
         yield return StartCoroutine(SpawnBlock());
-        yield return null;
+        yield return new WaitForEndOfFrame();
+        Debug.Log("뭐지5");
         yield return StartCoroutine(CheckLineH());
-        yield return null;
+        yield return new WaitForEndOfFrame();
+        Debug.Log("뭐지6");
         yield return StartCoroutine(LineClear());
-        yield return null;
+        yield return new WaitForEndOfFrame();
+        Debug.Log("뭐지7");
         yield return StartCoroutine(Organize());
-        
-        
+        yield return new WaitForEndOfFrame();
+        Debug.Log("뭐지8");
+        NeedMove = false;
+
+
     }
 
     
-    IEnumerator Left()
-    {
+        IEnumerator Left()
+        {
         NeedMove = true;
         yield return StartCoroutine(MoveLeft());
-        yield return new WaitForSeconds(0.01f);
-        /*yield return StartCoroutine(MoveLeft());
-        yield return new WaitForSeconds(0.2f);*/
+        yield return new WaitForEndOfFrame();
+        yield return StartCoroutine(CheckLineV());
+        yield return new WaitForEndOfFrame();
+        
         while(NeedMove)
         {
-            yield return StartCoroutine(CheckLineV());
-            yield return new WaitForSeconds(0.01f);
             if (LineNums != 0)
             {
                 yield return StartCoroutine(LineClear());
-                yield return new WaitForSeconds(0.01f);
-                yield return StartCoroutine(Organize());
-                yield return new WaitForSeconds(0.5f);
-                yield return StartCoroutine(MoveLeft());
                 yield return new WaitForSeconds(0.2f);
+                StartCoroutine(Organize());
+                yield return StartCoroutine(Organize());
+                yield return new WaitForEndOfFrame();
                 yield return StartCoroutine(MoveLeft());
-                yield return null;
-            }else if (LineNums == 0)
+                yield return new WaitForEndOfFrame();
+                yield return StartCoroutine(CheckLineV());
+                yield return new WaitForEndOfFrame();
+                
+            }
+            if (LineNums == 0)
             {
                 yield return null;
                 NeedMove = false;
+                StopCoroutine(MoveLeft());
             }
+            
         }
+        
         yield return new WaitForSeconds(0.3f);
         yield return StartCoroutine(SpawnBlock());
-        yield return null;
+        yield return new WaitForEndOfFrame();
         yield return StartCoroutine(CheckLineH());
-        yield return null;
+        yield return new WaitForEndOfFrame();
         yield return StartCoroutine(LineClear());
-        yield return null;
+        yield return new WaitForEndOfFrame();
         yield return StartCoroutine(Organize());
+        NeedMove = false;
 
-    }
-    IEnumerator Down()
-    {
+        }
+        IEnumerator Down(){
+        
         NeedMove = true;
         yield return StartCoroutine(MoveDown());
-        yield return new WaitForSeconds(0.01f);
-        /*yield return StartCoroutine(MoveDown());
-        yield return new WaitForSeconds(0.2f);*/
+        yield return new WaitForEndOfFrame();
+        yield return StartCoroutine(CheckLineH());
+        yield return new WaitForEndOfFrame();
         while(NeedMove)
         {
-            yield return StartCoroutine(CheckLineH());
-            yield return new WaitForSeconds(0.01f);
             if (LineNums != 0)
             {
+                
                 yield return StartCoroutine(LineClear());
-                yield return new WaitForSeconds(0.01f);
-                yield return StartCoroutine(Organize());
-                yield return new WaitForSeconds(0.5f);
-                yield return StartCoroutine(MoveDown());
                 yield return new WaitForSeconds(0.2f);
+                StartCoroutine(Organize());
+                yield return StartCoroutine(Organize());
+                yield return new WaitForEndOfFrame();
                 yield return StartCoroutine(MoveDown());
-                yield return null;
+                yield return new WaitForEndOfFrame();
+                yield return StartCoroutine(CheckLineH());
+                yield return new WaitForEndOfFrame();
+                
             }else if (LineNums == 0)
             {
                 yield return null;
                 NeedMove = false;
+                StopCoroutine(MoveDown());
             }
         }
         yield return new WaitForSeconds(0.3f);
         yield return StartCoroutine(SpawnBlock());
-        yield return null;
+        yield return new WaitForEndOfFrame();
         yield return StartCoroutine(CheckLineV());
-        yield return null;
+        yield return new WaitForEndOfFrame();
+        
         yield return StartCoroutine(LineClear());
-        yield return null;
+        yield return new WaitForEndOfFrame();
         yield return StartCoroutine(Organize());
-
+        yield return new WaitForEndOfFrame();
+        NeedMove = false;
+        
     }
     IEnumerator Up()
     {
         NeedMove = true;
         yield return StartCoroutine(MoveUp());
-        yield return new WaitForSeconds(0.01f);
-        /*yield return StartCoroutine(MoveUp());
-        yield return new WaitForSeconds(0.2f);*/
+        yield return new WaitForEndOfFrame();
+        yield return StartCoroutine(CheckLineH());
+        yield return new WaitForEndOfFrame();
         while(NeedMove)
         {
-            yield return StartCoroutine(CheckLineH());
-            yield return new WaitForSeconds(0.01f);
             if (LineNums != 0)
             {
+                
                 yield return StartCoroutine(LineClear());
-                yield return new WaitForSeconds(0.01f);
-                yield return StartCoroutine(Organize());
-                yield return new WaitForSeconds(0.5f);
-                yield return StartCoroutine(MoveUp());        
                 yield return new WaitForSeconds(0.2f);
-                yield return StartCoroutine(MoveUp());
-                yield return null;
+                StartCoroutine(Organize());
+                yield return StartCoroutine(Organize());
+                yield return new WaitForEndOfFrame();
+                yield return StartCoroutine(MoveUp());        
+                yield return new WaitForEndOfFrame();
+                yield return StartCoroutine(CheckLineH());
+                yield return new WaitForEndOfFrame();
+                
             }else if (LineNums == 0)
             {
                 yield return null;
                 NeedMove = false;
+                StopCoroutine(MoveUp());  
             }
         }
         yield return new WaitForSeconds(0.3f);
         yield return StartCoroutine(SpawnBlock());
-        yield return null;
+        yield return new WaitForEndOfFrame();
         yield return StartCoroutine(CheckLineV());
-        yield return null;
+        yield return new WaitForEndOfFrame();
+        
         yield return StartCoroutine(LineClear());
-        yield return null;
+        yield return new WaitForEndOfFrame();
         yield return StartCoroutine(Organize());
+        yield return new WaitForEndOfFrame();
+        NeedMove = false;
 
     }
     
