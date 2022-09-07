@@ -14,6 +14,8 @@ using Random = UnityEngine.Random;
 using Sequence = DG.Tweening.Sequence;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
+using UnityEngine.SceneManagement;
+
 
 
 public class GameManager : MonoBehaviour
@@ -34,7 +36,6 @@ public class GameManager : MonoBehaviour
     private Vector2[] BlockShape;
     public List<Block> MoveBlocks;
     public int LineNums = 0;
-    public List<Vector3> Good = new List<Vector3>();
 
     public bool NeedMove;
     public bool CanMove;
@@ -45,6 +46,8 @@ public class GameManager : MonoBehaviour
     private float currentTime;
     public int startSecond;
     public Text currentTimeText;
+
+    public GameObject overPrefab;
     
 
     void Start()
@@ -70,6 +73,7 @@ public class GameManager : MonoBehaviour
         {
             GameOver();
             currentTimeText.text = "Game Over";
+            return;
 
         }
         if (Input.GetKeyDown(KeyCode.Space))
@@ -127,8 +131,11 @@ public class GameManager : MonoBehaviour
             Destroy(block.gameObject);
             MoveBlocks.Remove(block);
         }
-
         Debug.Log("Game Over");
+        
+        StopAllCoroutines();
+        UnityEngine.SceneManagement.SceneManager.LoadScene(2);
+        
     }
     
     bool InRange(int x, int y)
