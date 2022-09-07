@@ -45,11 +45,7 @@ public class GameManager : MonoBehaviour
     private float currentTime;
     public int startSecond;
     public Text currentTimeText;
-
-    private void Awake()
-    {
-        currentTimeText.text = "Game Over";
-    }
+    
 
     void Start()
     {
